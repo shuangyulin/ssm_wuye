@@ -1,0 +1,49 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.SalaryMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加工资记录 -->
+	<insert id="addSalary" parameterType="salary">
+		insert into t_salary(employeeObj,year,month,salaryMoney,fafang) values 
+		(#{employeeObj.employeeNo},#{year},#{month},#{salaryMoney},#{fafang})
+	</insert>
+
+	<!-- 按照查询条件分页查询工资记录 -->
+	<select id="querySalary" resultMap="salaryMap" >
+		select t_salary.* from t_salary,t_employee ${where} and t_salary.employeeObj = t_employee.employeeNo limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="salaryMap" type="salary">
+        <id property="salaryId" column="salaryId" />
+        <association property="employeeObj" column="employeeObj" select="com.chengxusheji.mapper.EmployeeMapper.getEmployee" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有工资记录 -->
+	<select id="querySalaryList" resultMap="salaryMap" >
+		select t_salary.* from t_salary,t_employee ${where} and t_salary.employeeObj = t_employee.employeeNo
+	</select>
+
+    <!-- 按照查询条件的工资记录数 -->
+	<select id="querySalaryCount" resultType="int">
+		select count(*) from t_salary,t_employee ${where} and t_salary.employeeObj = t_employee.employeeNo
+	</select>
+
+	<!-- 根据主键查询某个工资记录 -->
+	<select id="getSalary" parameterType="int" resultMap="salaryMap">
+		select * from t_salary where t_salary.salaryId = #{salaryId}
+	</select>
+
+	<!-- 更新工资记录 -->
+	<update id="updateSalary" parameterType="salary">
+		update t_salary set employeeObj=#{employeeObj.employeeNo},year=#{year},month=#{month},salaryMoney=#{salaryMoney},fafang=#{fafang} where salaryId = #{salaryId}
+	</update>
+
+	<!-- 删除工资记录 -->
+	<delete id="deleteSalary" parameterType="int">
+		delete from t_salary where salaryId=#{salaryId}
+	</delete>
+
+</mapper>

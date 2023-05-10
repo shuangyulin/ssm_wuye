@@ -1,0 +1,49 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.ParkingMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加停车位记录 -->
+	<insert id="addParking" parameterType="parking">
+		insert into t_parking(parkingName,plateNumber,ownerObj,opUser) values 
+		(#{parkingName},#{plateNumber},#{ownerObj.ownerId},#{opUser})
+	</insert>
+
+	<!-- 按照查询条件分页查询停车位记录 -->
+	<select id="queryParking" resultMap="parkingMap" >
+		select t_parking.* from t_parking,t_owner ${where} and t_parking.ownerObj = t_owner.ownerId limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="parkingMap" type="parking">
+        <id property="parkingId" column="parkingId" />
+        <association property="ownerObj" column="ownerObj" select="com.chengxusheji.mapper.OwnerMapper.getOwner" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有停车位记录 -->
+	<select id="queryParkingList" resultMap="parkingMap" >
+		select t_parking.* from t_parking,t_owner ${where} and t_parking.ownerObj = t_owner.ownerId
+	</select>
+
+    <!-- 按照查询条件的停车位记录数 -->
+	<select id="queryParkingCount" resultType="int">
+		select count(*) from t_parking,t_owner ${where} and t_parking.ownerObj = t_owner.ownerId
+	</select>
+
+	<!-- 根据主键查询某个停车位记录 -->
+	<select id="getParking" parameterType="int" resultMap="parkingMap">
+		select * from t_parking where t_parking.parkingId = #{parkingId}
+	</select>
+
+	<!-- 更新停车位记录 -->
+	<update id="updateParking" parameterType="parking">
+		update t_parking set parkingName=#{parkingName},plateNumber=#{plateNumber},ownerObj=#{ownerObj.ownerId},opUser=#{opUser} where parkingId = #{parkingId}
+	</update>
+
+	<!-- 删除停车位记录 -->
+	<delete id="deleteParking" parameterType="int">
+		delete from t_parking where parkingId=#{parkingId}
+	</delete>
+
+</mapper>

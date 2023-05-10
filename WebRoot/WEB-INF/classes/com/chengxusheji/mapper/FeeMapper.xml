@@ -1,0 +1,50 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.FeeMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加收费记录 -->
+	<insert id="addFee" parameterType="fee">
+		insert into t_fee(feeTypeObj,ownerObj,feeDate,feeMoney,feeContent,opUser) values 
+		(#{feeTypeObj.typeId},#{ownerObj.ownerId},#{feeDate},#{feeMoney},#{feeContent},#{opUser})
+	</insert>
+
+	<!-- 按照查询条件分页查询收费记录 -->
+	<select id="queryFee" resultMap="feeMap" >
+		select t_fee.* from t_fee,t_feeType,t_owner ${where} and t_fee.feeTypeObj = t_feeType.typeId and t_fee.ownerObj = t_owner.ownerId limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="feeMap" type="fee">
+        <id property="feeId" column="feeId" />
+        <association property="feeTypeObj" column="feeTypeObj" select="com.chengxusheji.mapper.FeeTypeMapper.getFeeType" />
+        <association property="ownerObj" column="ownerObj" select="com.chengxusheji.mapper.OwnerMapper.getOwner" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有收费记录 -->
+	<select id="queryFeeList" resultMap="feeMap" >
+		select t_fee.* from t_fee,t_feeType,t_owner ${where} and t_fee.feeTypeObj = t_feeType.typeId and t_fee.ownerObj = t_owner.ownerId
+	</select>
+
+    <!-- 按照查询条件的收费记录数 -->
+	<select id="queryFeeCount" resultType="int">
+		select count(*) from t_fee,t_feeType,t_owner ${where} and t_fee.feeTypeObj = t_feeType.typeId and t_fee.ownerObj = t_owner.ownerId
+	</select>
+
+	<!-- 根据主键查询某个收费记录 -->
+	<select id="getFee" parameterType="int" resultMap="feeMap">
+		select * from t_fee where t_fee.feeId = #{feeId}
+	</select>
+
+	<!-- 更新收费记录 -->
+	<update id="updateFee" parameterType="fee">
+		update t_fee set feeTypeObj=#{feeTypeObj.typeId},ownerObj=#{ownerObj.ownerId},feeDate=#{feeDate},feeMoney=#{feeMoney},feeContent=#{feeContent},opUser=#{opUser} where feeId = #{feeId}
+	</update>
+
+	<!-- 删除收费记录 -->
+	<delete id="deleteFee" parameterType="int">
+		delete from t_fee where feeId=#{feeId}
+	</delete>
+
+</mapper>

@@ -1,0 +1,49 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.RepairMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加报修记录 -->
+	<insert id="addRepair" parameterType="repair">
+		insert into t_repair(ownerObj,repairDate,questionDesc,repairState,handleResult) values 
+		(#{ownerObj.ownerId},#{repairDate},#{questionDesc},#{repairState},#{handleResult})
+	</insert>
+
+	<!-- 按照查询条件分页查询报修记录 -->
+	<select id="queryRepair" resultMap="repairMap" >
+		select t_repair.* from t_repair,t_owner ${where} and t_repair.ownerObj = t_owner.ownerId limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="repairMap" type="repair">
+        <id property="repairId" column="repairId" />
+        <association property="ownerObj" column="ownerObj" select="com.chengxusheji.mapper.OwnerMapper.getOwner" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有报修记录 -->
+	<select id="queryRepairList" resultMap="repairMap" >
+		select t_repair.* from t_repair,t_owner ${where} and t_repair.ownerObj = t_owner.ownerId
+	</select>
+
+    <!-- 按照查询条件的报修记录数 -->
+	<select id="queryRepairCount" resultType="int">
+		select count(*) from t_repair,t_owner ${where} and t_repair.ownerObj = t_owner.ownerId
+	</select>
+
+	<!-- 根据主键查询某个报修记录 -->
+	<select id="getRepair" parameterType="int" resultMap="repairMap">
+		select * from t_repair where t_repair.repairId = #{repairId}
+	</select>
+
+	<!-- 更新报修记录 -->
+	<update id="updateRepair" parameterType="repair">
+		update t_repair set ownerObj=#{ownerObj.ownerId},repairDate=#{repairDate},questionDesc=#{questionDesc},repairState=#{repairState},handleResult=#{handleResult} where repairId = #{repairId}
+	</update>
+
+	<!-- 删除报修记录 -->
+	<delete id="deleteRepair" parameterType="int">
+		delete from t_repair where repairId=#{repairId}
+	</delete>
+
+</mapper>

@@ -1,0 +1,49 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.OwnerMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加业主记录 -->
+	<insert id="addOwner" parameterType="owner">
+		insert into t_owner(password,buildingObj,roomNo,ownerName,area,telephone,memo) values 
+		(#{password},#{buildingObj.buildingId},#{roomNo},#{ownerName},#{area},#{telephone},#{memo})
+	</insert>
+
+	<!-- 按照查询条件分页查询业主记录 -->
+	<select id="queryOwner" resultMap="ownerMap" >
+		select t_owner.* from t_owner,t_building ${where} and t_owner.buildingObj = t_building.buildingId limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="ownerMap" type="owner">
+        <id property="ownerId" column="ownerId" />
+        <association property="buildingObj" column="buildingObj" select="com.chengxusheji.mapper.BuildingMapper.getBuilding" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有业主记录 -->
+	<select id="queryOwnerList" resultMap="ownerMap" >
+		select t_owner.* from t_owner,t_building ${where} and t_owner.buildingObj = t_building.buildingId
+	</select>
+
+    <!-- 按照查询条件的业主记录数 -->
+	<select id="queryOwnerCount" resultType="int">
+		select count(*) from t_owner,t_building ${where} and t_owner.buildingObj = t_building.buildingId
+	</select>
+
+	<!-- 根据主键查询某个业主记录 -->
+	<select id="getOwner" parameterType="int" resultMap="ownerMap">
+		select * from t_owner where t_owner.ownerId = #{ownerId}
+	</select>
+
+	<!-- 更新业主记录 -->
+	<update id="updateOwner" parameterType="owner">
+		update t_owner set password=#{password},buildingObj=#{buildingObj.buildingId},roomNo=#{roomNo},ownerName=#{ownerName},area=#{area},telephone=#{telephone},memo=#{memo} where ownerId = #{ownerId}
+	</update>
+
+	<!-- 删除业主记录 -->
+	<delete id="deleteOwner" parameterType="int">
+		delete from t_owner where ownerId=#{ownerId}
+	</delete>
+
+</mapper>

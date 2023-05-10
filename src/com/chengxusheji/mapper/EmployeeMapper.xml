@@ -1,0 +1,48 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.EmployeeMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加员工记录 -->
+	<insert id="addEmployee" parameterType="employee">
+		insert into t_employee(employeeNo,name,sex,positionName,telephone,address,employeeDesc) values 
+		(#{employeeNo},#{name},#{sex},#{positionName},#{telephone},#{address},#{employeeDesc})
+	</insert>
+
+	<!-- 按照查询条件分页查询员工记录 -->
+	<select id="queryEmployee" resultMap="employeeMap" >
+		select t_employee.* from t_employee ${where} limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="employeeMap" type="employee">
+        <id property="employeeNo" column="employeeNo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有员工记录 -->
+	<select id="queryEmployeeList" resultMap="employeeMap" >
+		select t_employee.* from t_employee ${where}
+	</select>
+
+    <!-- 按照查询条件的员工记录数 -->
+	<select id="queryEmployeeCount" resultType="int">
+		select count(*) from t_employee ${where}
+	</select>
+
+	<!-- 根据主键查询某个员工记录 -->
+	<select id="getEmployee" parameterType="string" resultMap="employeeMap">
+		select * from t_employee where t_employee.employeeNo = #{employeeNo}
+	</select>
+
+	<!-- 更新员工记录 -->
+	<update id="updateEmployee" parameterType="employee">
+		update t_employee set name=#{name},sex=#{sex},positionName=#{positionName},telephone=#{telephone},address=#{address},employeeDesc=#{employeeDesc} where employeeNo = #{employeeNo}
+	</update>
+
+	<!-- 删除员工记录 -->
+	<delete id="deleteEmployee" parameterType="string">
+		delete from t_employee where employeeNo=#{employeeNo}
+	</delete>
+
+</mapper>

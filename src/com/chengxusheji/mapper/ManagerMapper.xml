@@ -1,0 +1,48 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.ManagerMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加管理员记录 -->
+	<insert id="addManager" parameterType="manager">
+		insert into t_manager(manageUserName,password,manageType,name,sex,telephone) values 
+		(#{manageUserName},#{password},#{manageType},#{name},#{sex},#{telephone})
+	</insert>
+
+	<!-- 按照查询条件分页查询管理员记录 -->
+	<select id="queryManager" resultMap="managerMap" >
+		select t_manager.* from t_manager ${where} limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="managerMap" type="manager">
+        <id property="manageUserName" column="manageUserName" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有管理员记录 -->
+	<select id="queryManagerList" resultMap="managerMap" >
+		select t_manager.* from t_manager ${where}
+	</select>
+
+    <!-- 按照查询条件的管理员记录数 -->
+	<select id="queryManagerCount" resultType="int">
+		select count(*) from t_manager ${where}
+	</select>
+
+	<!-- 根据主键查询某个管理员记录 -->
+	<select id="getManager" parameterType="string" resultMap="managerMap">
+		select * from t_manager where t_manager.manageUserName = #{manageUserName}
+	</select>
+
+	<!-- 更新管理员记录 -->
+	<update id="updateManager" parameterType="manager">
+		update t_manager set password=#{password},manageType=#{manageType},name=#{name},sex=#{sex},telephone=#{telephone} where manageUserName = #{manageUserName}
+	</update>
+
+	<!-- 删除管理员记录 -->
+	<delete id="deleteManager" parameterType="string">
+		delete from t_manager where manageUserName=#{manageUserName}
+	</delete>
+
+</mapper>
